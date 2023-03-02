@@ -1,5 +1,5 @@
 requests
 auth
-jwt
+pyjwt
 dataclasses
 pathlib
