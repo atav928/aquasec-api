@@ -11,6 +11,7 @@ class API:
     """_summary_
     """
     cloudsploit_url: str = "https://api.cloudsploit.com/{}/{}"
+    workload_url: str = "{}/api/{}/{}"
     endpoint_alerts: str = "alerts"
     endpoint_apikeys: str = "apikeys"
 
@@ -20,7 +21,7 @@ class API:
 
         # Bind API method classes to this object
         subclasses = self._subclass_container()
-        self.get = subclasses['get']
+        self.get = subclasses['get']()
 
     def list_supported_urls(self) -> list:
         supported_urls = []

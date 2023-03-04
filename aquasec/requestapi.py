@@ -2,8 +2,9 @@
 from typing import Any, Dict
 import requests
 
-from aquasec import config, logger
-from aquasec.auth import WorkloadAuth, refresh_workload_token, create_headers
+from aquasec import config, logger, create_headers
+from aquasec.auth import WorkloadAuth, refresh_workload_token
+from aquasec.exceptions import AquaSecMissingParam
 
 logger.addLogger(__name__)
 aquasec_logger = logger.getLogger(__name__)
@@ -12,7 +13,7 @@ if not config.SET_LOG:
 
 
 @refresh_workload_token
-def aqua_workload_request(token: WorkloadAuth, **kwargs) -> Dict[str, Any]:  # pylint: disable=too-many-locals
+def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, Any]:  # pylint: disable=too-many-locals
     """_summary_
 
     Args:
@@ -34,18 +35,24 @@ def aqua_workload_request(token: WorkloadAuth, **kwargs) -> Dict[str, Any]:  # p
     Returns:
         _type_: _description_
     """
-    #TODO: Fix
+    # TODO: Fix
+    try:
+        method: str = kwargs.pop('method')
+        url: str = kwargs.pop('url')
+    except KeyError as err:
+        raise AquaSecMissingParam(str(err))
     response = requests.request(method=method,
                                 url=url,
-                                headers=headers,
-                                data=data,
-                                params=params,
-                                verify=verify,
-                                timeout=timeout)
+                                headers=workload_auth.headers,
+                                #data=data,
+                                #params=params,
+                                verify=True,
+                                timeout=60)
     response.raise_for_status()
     return response.json()
 
-def aqua_cloudsploit_request(url: str, method: str, **kwargs) -> Dict[str,Any]:
+
+def aqua_cloudsploit_request(url: str, method: str, **kwargs) -> Dict[str, Any]:
     """_summary_
 
     Args:

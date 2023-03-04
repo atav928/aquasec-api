@@ -1,7 +1,6 @@
 """Utilities"""
 
 
-
 def set_bool(value: str, default: bool = False) -> bool:
     """sets bool value when pulling string from os env
 
@@ -22,6 +21,3 @@ def set_bool(value: str, default: bool = False) -> bool:
     else:
         value_bool: bool = False
     return value_bool
-
-
-

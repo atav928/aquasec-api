@@ -11,6 +11,7 @@ import requests
 
 ENCODING = "utf-8"
 
+
 class WorkloadAuth:
     """Workload Token Authorization with expiration time
 
@@ -36,6 +37,8 @@ class WorkloadAuth:
     aqua_gw_url: str = ""
     csp_roles: list = []
     tenant: str = ''
+    # cwpp_header
+    headers: dict = {}
 
     def __init__(self, api_key: str, api_secret: str, api_version: str = 'v2', **kwargs):
         self.api_version = api_version
@@ -61,6 +64,7 @@ class WorkloadAuth:
         # TODO: remove all print
         print(f"{token=}")
         self._decode_aqua_token(token=token)
+        self._cwpp_headers(token=token)
         # TODO: Fix return value should actually gen token
         return token
 
@@ -91,7 +95,14 @@ class WorkloadAuth:
         self.aqua_gw_url = f'https://{decoded_parse["csp_metadata"]["urls"]["ese_gw_url"]}'
         self.csp_roles = decoded_parse['csp_roles']
         self.tenant = decoded_parse["csp_metadata"]["urls"]["ese_url"].split('.')[0]
-    
+
+    def _cwpp_headers(self, token: str) -> None:
+        self.headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+
     def create_headers(self) -> dict:
         """Create AquaSec Header
 
@@ -124,12 +135,13 @@ class WorkloadAuth:
         print(f"headers={json.dumps(headers,indent=2)}")
         return headers
 
+
 def refresh_workload_token(decorated):
     """refreshes token"""
-    def wrapper(token: WorkloadAuth, *args, **kwargs):
-        if time.time() > token.access_token_expiration:
+    def wrapper(workload_auth: WorkloadAuth, *args, **kwargs):
+        if time.time() > workload_auth.access_token_expiration:
             # regenerate token and reset timmer
-            token.gen_token()
+            workload_auth.gen_token()
         # send back just token from auth class
-        return decorated(token.token, *args, **kwargs)
+        return decorated(workload_auth, *args, **kwargs)
     return wrapper
