@@ -1,0 +1,6 @@
+AQUA_API_KEY: "key"
+AQUA_API_SECRET: "secret"
+CERT: true
+AQUA_LOGGING: 'DEBUG'
+AQUA_LOGNAME: 'aquasec.log'
+AQUA_SET_LOG: true

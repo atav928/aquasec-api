@@ -3,3 +3,4 @@ auth
 pyjwt
 dataclasses
 pathlib
+pyyaml

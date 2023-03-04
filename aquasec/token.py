@@ -10,24 +10,35 @@ from requests.utils import DEFAULT_CA_BUNDLE_PATH
 import jwt
 from aquasec import config
 
-def headers(url: str, method: str = "GET", payload: str = "") -> dict:
+def create_headers(url: str, method: str = "GET", payload: str = "") -> dict:
+    """Create AquaSec Header
+
+    Args:
+        url (str): _description_
+        method (str, optional): _description_. Defaults to "GET".
+        payload (str, optional): _description_. Defaults to "".
+
+    Returns:
+        dict: _description_
+    """
+    # sets time for AquaSec to base the time limit of the token Expiration
     timestamp = str(int(time.time() * 1000))
     path = urlparse(url).path
     print(f"{path=}")
     string = (timestamp + method + path + payload).replace(" ", "")
     print(f"{string=}")
-    secret_bytes = bytes(config._API_SECRET, "utf-8")
+    secret_bytes = bytes(config.API_SECRET, "utf-8")
     string_bytes = bytes(string, "utf-8")
     sig = hmac.new(secret_bytes, msg=string_bytes, digestmod=hashlib.sha256).hexdigest()
-    header = {
+    headers = {
         "accept": "application/json",
         "x-api-key": config.API_KEY,
         "x-signature": sig,
         "x-timestamp": timestamp,
         "content-type": "application/json",
     }
-    print(f"headers={json.dumps(header,indent=2)}")
-    return header
+    print(f"headers={json.dumps(headers,indent=2)}")
+    return headers
 
 
 def cwpp_headers(token: str) -> dict:
@@ -45,18 +56,17 @@ def scan_headers(token: str = "") -> dict:
     return headers
 
 def gen_token():
-    #aqssl._create_default_https_context = ssl._create_unverified_context
+    ssl._create_default_https_context = ssl._create_unverified_context
     url = f"{config.API_URL}/tokens"
     method = 'POST'
     payload = json.dumps({"validity": 240, "allowed_endpoints": [
                          "ANY"], "csp_roles": ["api_auditor"]})
     print(f"{payload=}")
     # TODO: remove legacy auth requirements build my own header pass allong
-    request = requests.request(method="POST", url=url,data=payload, headers=headers(url, method, payload), timeout=60)
-    response_body = json.loads(request.text)
-    token = response_body["data"]
+    request = requests.request(method="POST", url=url,data=payload, headers=create_headers(url, method, payload), timeout=60)
+    print(f"{request.json()=}")
+    token = request.json()['data']
     # TODO: remove all print
-    print(f"{response_body=}")
     print(f"{token=}")
     # TODO: Fix return value should actually gen token
     return token
@@ -73,6 +83,7 @@ def get_aqua_url(token: str) -> str:
     """
     #### Decode JWT Token for URL ###
     decoded_parse = jwt.decode(token, options={"verify_signature": False})
+    # decoded_parse = jwt.decode(token, config._API_SECRET, algorithms=["HS256"])
     print(f"{decoded_parse=}")
     aqua_url = decoded_parse["csp_metadata"]["urls"]["ese_url"]
     print(f"{aqua_url=}")
