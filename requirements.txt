@@ -1,5 +1,4 @@
 requests
 pyjwt
 dataclasses
-pathlib
 pyyaml~=6.0
