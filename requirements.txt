@@ -1,6 +1,5 @@
 requests
-pyjwt~=2.6.0
+auth
+jwt
 dataclasses
-pyyaml~=6.0
-setuptools>=65.5.1
-certifi>=2022.12.7
+pathlib
