@@ -28,3 +28,4 @@ python -m pip install aquasec-api
 | **0.0.1** | **a1** | Initial Alpha Release. Not working baseline for testing |
 | **0.0.1** | **a2** | built in decorartor and two methods of handling different request types |
 | **0.0.1** | **a3** | fixed manifest for package deployment |
+| **0.0.1** | **a4** | fixed requirements |
