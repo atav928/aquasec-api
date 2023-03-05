@@ -6,6 +6,7 @@ Aqua Sec Cloud Secuirty API Tool used for interacting with Aqua Security CSPM En
 
 * [CSPM API Docs](https://cloudsploit.docs.apiary.io/#)
 * [Aqua CSPM API Overview](https://support.aquasec.com/support/solutions/articles/16000129694-aqua-cspm-api-overview)
+* [Authenticte Enterprise CSPM](https://support.aquasec.com/support/solutions/articles/16000127855-how-to-authenticate-to-the-enterprise-api-in-the-cspm-platform)
 * [GitHub Repository](https://github.com/atav928/aquasec-api)
 
 ## Installation
