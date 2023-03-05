@@ -1,5 +1,4 @@
 requests
-wheel>=0.38.4,<0.39.0
 pyjwt~=2.6.0
 dataclasses>=0.4
 pyyaml~=6.0
