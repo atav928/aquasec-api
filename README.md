@@ -106,3 +106,4 @@ ERROR   : AquaSecPermission: You are not allowed to perform this action
 | __0.0.1__ | __a4__ | fixed requirements |
 | __0.0.1__ | __a5__ | removed pathlib from requirments |
 | __0.0.1__ | __rc1__| updated readme.md with instructions of usage |
+| __0.0.1__ | __rc2__ | issues with dataclasses module |
