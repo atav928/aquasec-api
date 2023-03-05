@@ -1,5 +1,5 @@
 requests
 pyjwt~=2.6.0
-dataclasses>=0.4
-pyyaml~=6.0
+dataclasses
+pyyaml
 certifi>=2022.12.7
