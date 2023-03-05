@@ -35,21 +35,21 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
     Returns:
         _type_: _description_
     """
-    # TODO: Fix
     try:
         method: str = kwargs.pop('method')
         url: str = kwargs.pop('url')
         timeout: int = kwargs.pop('timeout', 60)
+        verify = kwargs.pop('verify', config.CERT)
     except KeyError as err:
         error = reformat_exception(err)
         aquasec_logger.error("AquaSecMissingParam: %s", error)
-        raise AquaSecMissingParam(error)
+        raise AquaSecMissingParam(error)  # pylint: disable=raise-missing-from
     response = requests.request(method=method,
                                 url=url,
                                 headers=workload_auth.headers,
                                 # data=data,
                                 # params=params,
-                                verify=True,
+                                verify=verify,
                                 timeout=timeout)
     aquasec_logger.debug("Response Code: %s| Full Response: %s",
                          str(response.status_code), response.text)

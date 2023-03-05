@@ -1,3 +1,4 @@
+# pylint: disable=missing-class-docstring,too-few-public-methods
 """API"""
 
 from aquasec import logger, config, return_auth
