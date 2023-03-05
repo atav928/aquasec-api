@@ -1,8 +1,8 @@
-"""INIT"""
+"""Initialization"""
+
 import hashlib
 import hmac
 import json
-import os
 from os.path import expanduser, exists
 import time
 from urllib.parse import urlparse
@@ -17,6 +17,7 @@ from aquasec.logging import RotatingLog
 config = Config()
 home = expanduser("~")
 filename = f"{home}/.config/.aquaconf"
+# Prefer Yaml configs over OS ENV Settings
 if exists(filename):
     with open(filename, 'r', encoding='utf-8') as yam:
         yaml_config = yaml.safe_load(yam)
@@ -30,6 +31,7 @@ if exists(filename):
     config.LOGSTREAM = yaml_config.get("AQUA_LOGSTREAM", True)
     config.LOGLOCATION = yaml_config.get("AQUA_LOGLOCATION", "")
 
+
 def return_auth(**kwargs) -> WorkloadAuth:
     """_summary_
 
@@ -39,10 +41,17 @@ def return_auth(**kwargs) -> WorkloadAuth:
     workload_auth = kwargs.pop('workload_auth') if kwargs.get('workload_auth') else ""
     if not workload_auth:
         if (kwargs.get('api_key') and kwargs.get('api_secret')):
-            workload_auth = WorkloadAuth(kwargs['api_key'], kwargs['api_secret'], kwargs.get('api_version', 'v2'), **kwargs)
+            workload_auth = WorkloadAuth(kwargs['api_key'],
+                                         kwargs['api_secret'],
+                                         kwargs.get('api_version', 'v2'),
+                                         **kwargs)
         else:
-            workload_auth = WorkloadAuth(config.API_KEY, config.API_SECRET, config.API_VERSION)
+            workload_auth = WorkloadAuth(config.API_KEY,
+                                         config.API_SECRET,
+                                         config.API_VERSION,
+                                         verify=config.CERT)
     return workload_auth
+
 
 def create_headers(url: str, method: str = "GET", payload: str = "", **kwargs) -> dict:
     """Create AquaSec Header
@@ -77,9 +86,10 @@ def create_headers(url: str, method: str = "GET", payload: str = "", **kwargs) -
     print(f"headers={json.dumps(headers,indent=2)}")
     return headers
 
+
 # Set logging if Logging set to True
 logger = RotatingLog(name=__name__,
                      logName=config.LOGNAME,
                      logDir=config.LOGLOCATION,
-                     stream=config.LOGSTREAM,
+                     stream=config.LOGSTREAM,  # type: ignore
                      level=config.LOGGING)

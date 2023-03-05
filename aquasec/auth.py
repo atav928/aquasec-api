@@ -8,6 +8,10 @@ from urllib.parse import urlparse
 import jwt
 
 import requests
+from requests import Response
+
+from aquasec.exceptions import AquaSecAPIError, AquaSecPermission
+
 
 ENCODING = "utf-8"
 
@@ -41,10 +45,12 @@ class WorkloadAuth:
     headers: dict = {}
 
     def __init__(self, api_key: str, api_secret: str, api_version: str = 'v2', **kwargs):
-        self.api_version = api_version
-        self.TOKEN_URL = self.TOKEN_URL.format(self.api_version)
-        self.api_key = api_key
-        self._api_secret = api_secret
+        self.api_version: str = api_version
+        self.TOKEN_URL: str = self.TOKEN_URL.format(self.api_version)
+        self.api_key: str = api_key
+        self._api_secret: str = api_secret
+        self.verify = kwargs.pop('verify', True)
+        self.timeout: int = kwargs.pop('timeout', 60)
         self.token = self.gen_token()
 
     def gen_token(self) -> str:
@@ -53,19 +59,21 @@ class WorkloadAuth:
         Returns:
             str: _description_
         """
-        # TODO: remove legacy auth requirements build my own header pass allong
         headers = self.create_headers()
-        request = requests.request(method="POST", url=self.TOKEN_URL,
-                                   data=self.PAYLOAD, headers=headers, timeout=60)
-        # ERROR: 'status': 403, 'id': 'a0cd8f1d-a617-4997-886f-00f8ea99dbf5', 'code': 1, 'message': 'Access denied', 'errors': ['The request is missing the session token. Please login.']}
-        request.raise_for_status()
-        # TODO: Raise Exception
-        token = request.json()["data"]
-        # TODO: remove all print
-        print(f"{token=}")
+        response = requests.request(method="POST",
+                                    url=self.TOKEN_URL,
+                                    data=self.PAYLOAD,
+                                    headers=headers,
+                                    timeout=self.timeout,
+                                    verify=self.verify)
+        # ERROR: 'status': 403, 'id': 'a0cd8f1d-a617-4997-886f-00f8ea99dbf5',
+        #  'code': 1, 'message': 'Access denied',
+        #  'errors': ['The request is missing the session token. Please login.']}
+        self.api_raise_error(response=response)
+        response.raise_for_status()
+        token = response.json()["data"]
         self._decode_aqua_token(token=token)
         self._cwpp_headers(token=token)
-        # TODO: Fix return value should actually gen token
         return token
 
     def _decode_aqua_token(self, token: str) -> None:
@@ -80,7 +88,7 @@ class WorkloadAuth:
         #### Decode JWT Token for URL ###
         decoded_parse = jwt.decode(token, options={"verify_signature": False})
         # decoded_parse = jwt.decode(token, config._API_SECRET, algorithms=["HS256"])
-        print(f"{decoded_parse=}")
+        # print(f"{decoded_parse=}")
         self.aqua_user_id = decoded_parse['user_id']
         self.account_id = decoded_parse['account_id']
         self.account_admin = decoded_parse['account_admin']
@@ -119,9 +127,9 @@ class WorkloadAuth:
         # sets time for AquaSec to base the time limit of the token Expiration
         timestamp = str(int(time.time() * 1000))
         path = urlparse(self.TOKEN_URL).path
-        print(f"{path=}")
+        # print(f"{path=}")
         string = (timestamp + self.method + path + self.PAYLOAD).replace(" ", "")
-        print(f"{string=}")
+        # print(f"{string=}")
         secret_bytes = bytes(self._api_secret, ENCODING)
         string_bytes = bytes(string, ENCODING)
         sig = hmac.new(secret_bytes, msg=string_bytes, digestmod=hashlib.sha256).hexdigest()
@@ -132,8 +140,24 @@ class WorkloadAuth:
             "x-timestamp": timestamp,
             "content-type": "application/json",
         }
-        print(f"headers={json.dumps(headers,indent=2)}")
+        # print(f"headers={json.dumps(headers,indent=2)}")
         return headers
+
+    def api_raise_error(self, response: Response) -> None:
+        """Raises error if response not what was expected
+
+        Args:
+            response (Response): _description_
+
+        Raises:
+            AquaSecPermission: _description_
+            AquaSecAPIError: _description_
+        """
+        if response.status_code == 403:
+            message = response.json().get("message", "Permission Denied")
+            raise AquaSecPermission(message)
+        if not (response.status_code >= 200 or response.status_code < 299):
+            raise AquaSecAPIError(response.json())
 
 
 def refresh_workload_token(decorated):
