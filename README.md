@@ -29,3 +29,4 @@ python -m pip install aquasec-api
 | **0.0.1** | **a2** | built in decorartor and two methods of handling different request types |
 | **0.0.1** | **a3** | fixed manifest for package deployment |
 | **0.0.1** | **a4** | fixed requirements |
+| **0.0.1** | **a5** | removed pathlib from requirments |
