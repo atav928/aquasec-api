@@ -2,3 +2,4 @@ requests
 pyjwt
 dataclasses
 pyyaml~=6.0
+setuptools>=65.5.1
