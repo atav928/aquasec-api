@@ -1,5 +1,6 @@
 """Exceptions"""
 
+
 class AquaSecError(Exception):
     """Prisma AquaSec Error"""
 
@@ -11,8 +12,10 @@ class AquaSecAuthError(AquaSecError):
 class AquaSecMissingParam(AquaSecError):
     """Missing parameters"""
 
+
 class AquaSecAPIError(AquaSecError):
     """Generic API Error"""
+
 
 class AquaSecPermission(AquaSecAPIError):
     """Invalid Permissions"""
