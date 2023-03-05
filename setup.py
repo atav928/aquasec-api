@@ -24,7 +24,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
-    test_suite="tests",
     url='https://github.com/atav928/aquasec-api',
     keywords=['aquasec'],
     long_description=readme,
