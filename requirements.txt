@@ -1,6 +1,5 @@
 requests
-auth
 pyjwt
 dataclasses
 pathlib
-pyyaml
+pyyaml~=6.0
