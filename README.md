@@ -108,3 +108,4 @@ ERROR   : AquaSecPermission: You are not allowed to perform this action
 | __0.0.1__ | __rc1__| updated readme.md with instructions of usage |
 | __0.0.1__ | __rc2__ | issues with dataclasses module |
 | __0.0.1__ | __rc3__ | issues with dataclasses and requirements |
+| __0.0.1__ | __rc4__ | issues with dataclasses and requirements |
