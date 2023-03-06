@@ -55,7 +55,8 @@ def return_auth(**kwargs) -> WorkloadAuth:
             workload_auth = WorkloadAuth(config.API_KEY,
                                          config.API_SECRET,
                                          config.API_VERSION,
-                                         verify=config.CERT)
+                                         verify=config.CERT,
+                                         **kwargs)
     return workload_auth
 
 
