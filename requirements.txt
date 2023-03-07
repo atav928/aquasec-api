@@ -1,5 +1,4 @@
 requests
-pyjwt~=2.6.0
+pyjwt
 dataclasses
 pyyaml
-certifi>=2022.12.7
