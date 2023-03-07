@@ -18,6 +18,9 @@ class API:
     """
     cloudsploit_url: str = "https://api.cloudsploit.com/{}/{}"
     workload_url: str = "{}/api/{}/{}"
+    api_version: str = "" # set on initialization
+    # Endpoints for CSPM going away from this
+    # TODO: Remove the endpoint capability and just use the direct csmp get()
     endpoint_alerts: str = "alerts"
     endpoint_apikeys: str = "apikeys"
     endpoint_auditlogs: str = "auditlogs"

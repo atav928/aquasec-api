@@ -13,19 +13,21 @@ if not config.SET_LOG:
 
 
 class Get:
-    """Get Class for Aquasec
-
-    Returns:
-        _type_: _description_
+    """Get Class for Aquasec CSPM and Workload Protection
     """
     _parent_class = None
     method: str = "GET"
 
     def cspm(self, url_path: str, **kwargs):
-        """_summary_
+        """Creates CSPM endpoint. Pass any paremters required to complete the Request.
+
+        Args:
+            url_path (str, required): The URL resource path. Ex "alerts"
+            params (dict, optional): RestAPI parameters
+            api_version (str, optional): Defaults to configured version
 
         Returns:
-            _type_: _description_
+            dict: JSON results
         """
         api_version: str = kwargs.pop("api_verison", self._parent_class.api_version)  # type: ignore
         url = self._parent_class.cloudsploit_url.format(  # type:ignore
@@ -37,13 +39,17 @@ class Get:
         return response
 
     def workload_protection(self, url_path: str, **kwargs):
-        """Workload Protection Requests
+        """Workload Protection Requests, see README.md for some assistance here.
+            this is difficult to get as there is no documentation and most is pulled
+            from the cloud portal. But there are some examples to help on readme.
 
         Args:
-            endpoint (str): _description_
+            url_path (str): The URL Resource path. Ex: "risks/bench/{id}/bench_results"
+            api_version (str, optional): Overrides the version set in the configuration
+            params (dict, Optional): required params for request see README for examples
 
         Returns:
-            _type_: _description_
+            dict: JSON results
         """
         try:
             api_version: str = kwargs.pop(
@@ -72,7 +78,8 @@ class Get:
         Returns:
             str: _description_
         """
-        api_version: str = kwargs.pop('api_version', self._parent_class.api_version)  # type :ignore
+        api_version: str = kwargs.pop(
+            'api_version', self._parent_class.api_version)  # type: ignore # type :ignore
         url = self._parent_class.cloudsploit_url.format(api_version, url_path)  # type: ignore
         return url
 

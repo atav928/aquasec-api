@@ -33,8 +33,10 @@ You are able to directly interact with the SDK and pass the variables required t
     __Required:__
 
     ```bash
-    AQUA_API_KEY="your api key"
-    AQUA_API_SECRET="your api secret"
+    AQUA_WORKLOAD_API_KEY="workload key"
+    AQUA_WORKLOAD_API_SECRET="workload secret"
+    AQUA_CSPM_API_KEY="cspm key"
+    AQUA_CSPM_API_SECRET="cspm secret"
     AQUA_API_VERSION"='v2'
     ```
 
@@ -54,8 +56,10 @@ You are able to directly interact with the SDK and pass the variables required t
     __Required:__
 
     ```yaml
-    AQUA_API_KEY: "API KEY"
-    AQUA_API_SECRET: "API SECRET"
+    AQUA_WORKLOAD_API_KEY: "workload key"
+    AQUA_WORKLOAD_API_SECRET: "workload secret"
+    AQUA_CSPM_API_KEY: "cspm key"
+    AQUA_CSPM_API_SECRET: "cspm secret"
     AQUA_API_VERSION: 'v2'
     ```
 
@@ -72,21 +76,101 @@ You are able to directly interact with the SDK and pass the variables required t
 
 ## Usage
 
-```bash
->>> from aquasec.api import API
->>> api = API()
-INFO    : Created WorkloadAuth Token for URL https://1234567890ab.cloud.aquasec.com
->>> api.get.alerts()
-DEBUG   : Response Code: 403| Full Response: {"status":403,"id":"e4ac385c-c7c1-472c-861d-77166fbebeaa","code":1,"message":"Access denied","errors":["This endpoint and method requires the alerts::read permission."]}
-ERROR   : AquaSecPermission: Access denied
-```
+### Workload Protection
+
+Inorder to ensure it workload auth works please be sure to pass the correct paremters that are not set in the configurations. You will require to set variables:
+
+* allowed_endpoints: list
+  * Default: __["api_auditor"]__
+* csp_roles: list
+  * Default: __["ANY"]__
 
 ```bash
->>> api.get.check_license()
-DEBUG   : Created url https://1234567890ab.cloud.aquasec.com/api/v2/license
-DEBUG   : Response Code: 403| Full Response: {"message":"You are not allowed to perform this action","code":403}
-ERROR   : AquaSecPermission: You are not allowed to perform this action
+>>> from aquasec.api import API
+>>> api = API(csp_roles=["api_auditor"], allowed_endpoints=["ANY", "GET", "POST"])
+INFO    : Created WorkloadAuth Token for URL https://1234567890ab.cloud.aquasec.com
+>>> api.get.workload_protection(url_path='license')
+INFO    : Created Workload URL=https://1234567890ab.cloud.aquasec.com/api/v2/license
+DEBUG   : Response Code: 200| Full Response: {"type":"Standard","organization":"ACME Corp, Inc.","account_id":"","client_name":"user@ACME Corp, Inc.-2023-03-29-StandardS","name":"","email":"john.doe@acme.com","num_agents":0,"num_microenforcers":0,"num_hostenforcers":0,"num_images":0,"num_functions":10000,"num_advanced_functions":0,"num_pas":-1,"num_code_repositories":0,"license_issue_date":1641772800,"license_exp_date":1768003199,"non_prod":false,"approved":true,"external_token":"","strict":false,"level":"Advanced","vpatch":true,"vpatch_coverage":0,"malware_protection":true,"tier":"","agents_running":0,"images_scanned":0,"num_protected_kube_nodes":0,"resource_status":{"Enforcers":"valid","Kubernetes cluster protection":"valid","MicroEnforcers":"valid","Repositories":"valid","VM Enforcers":"valid"}}
 ```
+
+__Common Params:__
+
+```json
+{
+    "page": 1,
+    "pagesize": 1000
+}
+```
+
+I found treating page similar to _"limit"_ for a typical API call limiting the amount of responses and _"pagesize"_ is akin to _"offset"_. Responses typically look like this:
+
+```json
+{
+    "count": 8793,
+    "page": 1,
+    "pagesize": 9000,
+    "result": [
+        {
+            "id": "9ad366ef-1494-44c1-9b1f-928bca02cf7d",
+            "name": "someserver.acme.com",
+        }
+    ],
+    "query": {
+        "identifiers_only": false,
+        "enforcer_type": "",
+        "status": "",
+        "cluster": "",
+        "image_name": "",
+        "image_id": "",
+        "server_id": "",
+        "kube_enforcer_id": "",
+        "batch_name": "",
+        "compliant": "",
+        "address": "",
+        "cve": "",
+        "config_file_name": "",
+        "scope": "",
+        "machine_ids": null,
+        "kube_enforcer_exists": false,
+        "ke_kube_bench_feature_flag": false
+    },
+    "more_data_all_pages": 0,
+    "is_estimated_count": false
+}
+```
+
+__Common useful endpoints:__
+
+* Get all hosts (I increase the size based on my company count; you can build out a refresh to get everything until the count equals the amount of records returned)
+
+    ```bash
+    >> all_hosts = api.get.workload_protection(url_path='hosts', api_version='v1', params={'pagesize: 1000})
+    ```
+
+* Get CIS Benchmark Results
+
+    ```bash
+    >> cis_benchmark = api.get.workload_protection(url_path='risk/bench/{id}/bench_results)
+    ```
+
+* Get Kubernetes Resources
+
+    ```bash
+    >> kube_resources = api.get.workload_protection(url_path='kubernetesresources', params={'pagesize': 1000})
+    ```
+
+* Get Kubernetes Applications
+
+    ```bash
+    >> applications = api.get.workload_protection(endpoint='applications', api_version='v1')
+    ```
+
+* Get Containers
+
+    ```bash
+    >>> all_containers = api.get.workload_protection(url_path="containers", api_version='v2', params={'pagesize': 3000})
+    ```
 
 ## Release Info
 
@@ -95,6 +179,7 @@ ERROR   : AquaSecPermission: You are not allowed to perform this action
 * WorkloadAuth - usage to get auth token for workload tasks
 * API - used to run api calls against CSPM or Workload
 * Baseline version to interact with CSPM Enterprise and Workload
+* GET is built out to handle almost any api call you need. You just need to figure out the endpoint and pass the url path through the __workload_protection__ or __cspm__
 
 ## Version
 
@@ -109,3 +194,6 @@ ERROR   : AquaSecPermission: You are not allowed to perform this action
 | __0.0.1__ | __rc2__ | issues with dataclasses module |
 | __0.0.1__ | __rc3__ | issues with dataclasses and requirements |
 | __0.0.1__ | __rc4__ | issues with dataclasses and requirements |
+| __0.0.1__ | __rc8__ | final release that solves how the auth works for CSPM and Workload Protection |
+
+__NOTE:__ Use at your own risk!!!! API as is and building on it.
