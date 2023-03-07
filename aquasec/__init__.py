@@ -20,8 +20,11 @@ filename = f"{home}/.config/.aquaconf"
 if exists(filename):
     with open(filename, 'r', encoding='utf-8') as yam:
         yaml_config = yaml.safe_load(yam)
-    config.API_KEY = yaml_config['AQUA_API_KEY']
-    config.API_SECRET = yaml_config['AQUA_API_SECRET']
+    config.WORKLOAD_API_KEY = yaml_config.get('AQUA_WORKLOAD_API_KEY', config.WORKLOAD_API_KEY)
+    config.WORKLOAD_API_SECRET = yaml_config.get(
+        'AQUA_WORKLOAD_API_SECRET', config.WORKLOAD_API_SECRET)
+    config.CSPM_API_KEY = yaml_config.get("AQUA_CSPM_API_KEY", config.CSPM_API_KEY)
+    config.CSPM_API_SECRET = yaml_config.get("AQUA_CSPM_API_SECRET", config.CSPM_API_SECRET)
     config.API_VERSION = yaml_config.get("AQUA_API_VERSION", 'v2')
     config.CERT = yaml_config.get('AQUA_CERT', False)
     config.LOGGING = yaml_config.get("AQUA_LOGGING", "INFO")
@@ -31,7 +34,7 @@ if exists(filename):
     config.LOGLOCATION = yaml_config.get("AQUA_LOGLOCATION", "")
 
 
-def return_auth(**kwargs) -> WorkloadAuth:
+def return_workload_auth(**kwargs) -> WorkloadAuth:
     """Return Workload Authorization
 
     Args:
@@ -52,14 +55,15 @@ def return_auth(**kwargs) -> WorkloadAuth:
                                          kwargs.get('api_version', 'v2'),
                                          **kwargs)
         else:
-            workload_auth = WorkloadAuth(config.API_KEY,
-                                         config.API_SECRET,
+            workload_auth = WorkloadAuth(config.WORKLOAD_API_KEY,
+                                         config.WORKLOAD_API_SECRET,
                                          config.API_VERSION,
-                                         verify=config.CERT)
+                                         verify=config.CERT,
+                                         **kwargs)
     return workload_auth
 
 
-def create_headers(url: str, method: str = "GET", payload: str = "", **kwargs) -> dict:
+def create_cspm_headers(url: str, method: str = "GET", payload: str = "", **kwargs) -> dict:
     """Create AquaSec Header
 
     Args:
@@ -76,12 +80,12 @@ def create_headers(url: str, method: str = "GET", payload: str = "", **kwargs) -
     timestamp = str(int(time.time() * 1000))
     path = urlparse(url).path
     string = (timestamp + method + path + payload).replace(" ", "")
-    secret_bytes = bytes(kwargs.pop('api_secret', config.API_SECRET), config.ENCODING)
+    secret_bytes = bytes(kwargs.pop('api_secret', config.CSPM_API_SECRET), config.ENCODING)
     string_bytes = bytes(string, config.ENCODING)
     sig = hmac.new(secret_bytes, msg=string_bytes, digestmod=hashlib.sha256).hexdigest()
     headers = {
         "accept": "application/json",
-        "x-api-key": kwargs.pop('api_key', config.API_KEY),
+        "x-api-key": kwargs.pop('api_key', config.CSPM_API_KEY),
         "x-signature": sig,
         "x-timestamp": timestamp,
         "content-type": "application/json",

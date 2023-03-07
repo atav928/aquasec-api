@@ -1,7 +1,7 @@
 # pylint: disable=missing-class-docstring,too-few-public-methods
 """API"""
 
-from aquasec import logger, config, return_auth
+from aquasec import logger, config, return_workload_auth
 from aquasec.get import Get
 from aquasec.post import Post
 from aquasec.utilities import reformat_exception
@@ -20,10 +20,27 @@ class API:
     workload_url: str = "{}/api/{}/{}"
     endpoint_alerts: str = "alerts"
     endpoint_apikeys: str = "apikeys"
+    endpoint_auditlogs: str = "auditlogs"
+    # Testing workload and endpoint types.. this should eventually go away
+    # TODO: figure out how to get all the actual endpoints listed some how and their params
+    workload_license = 'licenses'
+    workload_assurance_policy = 'assurance_policy'  # Query params
+    workload_access_management = 'access_management'  # access_management/scopes/available
+    workload_firewall_polcies = "firewall_polcies"
+    workload_fatureflags = "featureflags"
+    workload_notifications = 'notifications'
+    workload_vul_insghts = "dashboards/widgets/vulnerabilityInsights"
+    worload_vul_trends = "dashboards/widgets/imagesVulnerabilitiesTrends"  # param period: str 1h
+    # Version 1
+    workload_features = "features"
+    workload_network_policies = "networkpolicies"
+    workload_hosts = "hosts"  # batch_name={clustername}page=1 pagesize=10
+    # params orderby=name page=1 pagesize=200 orderedby=display_name type=enforcer
+    workload_applications = "applications"
 
     def __init__(self, **kwargs):
         try:
-            self.workload_auth = return_auth(**kwargs)
+            self.workload_auth = return_workload_auth(**kwargs)
             aqua_logger.info("Created WorkloadAuth Token for URL %s", self.workload_auth.aqua_url)
         except (AquaSecPermission, AquaSecAPIError) as err:
             error = reformat_exception(err)

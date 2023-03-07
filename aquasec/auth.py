@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import time
+from typing import List
 from urllib.parse import urlparse
 import jwt
 
@@ -23,8 +24,6 @@ class WorkloadAuth:
         _type_: _description_
     """
     TOKEN_URL = "https://api.cloudsploit.com/{}/tokens"
-    PAYLOAD: str = json.dumps({"validity": 240, "allowed_endpoints": [
-        "ANY"], "csp_roles": ["api_auditor"]})
     method: str = "POST"
     # Decoded Token Data
     account_id: int = 0
@@ -39,7 +38,7 @@ class WorkloadAuth:
     csp_metadata: dict = {}
     aqua_url: str = ""
     aqua_gw_url: str = ""
-    csp_roles: list = []
+    # csp_roles: list = []
     tenant: str = ''
     # cwpp_header
     headers: dict = {}
@@ -49,6 +48,10 @@ class WorkloadAuth:
         self.TOKEN_URL: str = self.TOKEN_URL.format(self.api_version)
         self.api_key: str = api_key
         self._api_secret: str = api_secret
+        self.allowed_endpoints: list = kwargs.pop("allowed_endpoints", ["ANY"])
+        self.csp_roles: list = kwargs.pop("csp_roles", ["api_auditor"])
+        self.payload: str = self._create_payload(allowed_endpoints=self.allowed_endpoints,
+                                                 csp_roles=self.csp_roles)
         self.verify = kwargs.pop('verify', True)
         self.timeout: int = kwargs.pop('timeout', 60)
         self.token = self.gen_token()
@@ -62,7 +65,7 @@ class WorkloadAuth:
         headers = self.create_headers()
         response = requests.request(method="POST",
                                     url=self.TOKEN_URL,
-                                    data=self.PAYLOAD,
+                                    data=self.payload,
                                     headers=headers,
                                     timeout=self.timeout,
                                     verify=self.verify)
@@ -75,6 +78,13 @@ class WorkloadAuth:
         self._decode_aqua_token(token=token)
         self._cwpp_headers(token=token)
         return token
+
+    def _create_payload(self,
+                        allowed_endpoints: List[str],
+                        csp_roles: List[str]) -> str:
+        return json.dumps({"validity": 240,
+                           "allowed_endpoints": allowed_endpoints,
+                           "csp_roles": csp_roles})
 
     def _decode_aqua_token(self, token: str) -> None:
         """Decodes token and returns the Aqua Tenant URL Endpoint
@@ -128,7 +138,7 @@ class WorkloadAuth:
         timestamp = str(int(time.time() * 1000))
         path = urlparse(self.TOKEN_URL).path
         # print(f"{path=}")
-        string = (timestamp + self.method + path + self.PAYLOAD).replace(" ", "")
+        string = (timestamp + self.method + path + self.payload).replace(" ", "")
         # print(f"{string=}")
         secret_bytes = bytes(self._api_secret, ENCODING)
         string_bytes = bytes(string, ENCODING)
