@@ -3,7 +3,7 @@ from typing import Any, Dict
 import requests
 from requests import Response
 
-from aquasec import config, logger, create_headers
+from aquasec import config, logger, create_cspm_headers
 from aquasec.auth import WorkloadAuth, refresh_workload_token
 from aquasec.exceptions import (AquaSecAPIError, AquaSecMissingParam, AquaSecPermission)
 from aquasec.utilities import reformat_exception
@@ -40,6 +40,7 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
         url: str = kwargs.pop('url')
         timeout: int = kwargs.pop('timeout', 60)
         verify = kwargs.pop('verify', config.CERT)
+        params: dict = kwargs.pop('params', {})
     except KeyError as err:
         error = reformat_exception(err)
         aquasec_logger.error("AquaSecMissingParam: %s", error)
@@ -48,7 +49,7 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
                                 url=url,
                                 headers=workload_auth.headers,
                                 # data=data,
-                                # params=params,
+                                params=params,
                                 verify=verify,
                                 timeout=timeout)
     aquasec_logger.debug("Response Code: %s| Full Response: %s",
@@ -70,12 +71,14 @@ def aqua_cloudsploit_request(url: str, method: str, **kwargs) -> Dict[str, Any]:
         Dict[str,Any]: _description_
     """
     payload = kwargs.pop("payload") if kwargs.get("payload") else ""
-    headers = create_headers(url=url, method=method, payload=payload)
-    verify = kwargs.pop('verify', True)
+    headers = create_cspm_headers(url=url, method=method, payload=payload)
+    verify = kwargs.pop('verify', config.CERT)
     timeout: int = kwargs.pop('timeout', 60)
+    params: dict = kwargs.pop('params', {})
     response = requests.request(method=method,
                                 url=url,
                                 headers=headers,
+                                params=params,
                                 timeout=timeout,
                                 verify=verify)
     aquasec_logger.debug("Response Code: %s| Full Response: %s",

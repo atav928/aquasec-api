@@ -6,8 +6,10 @@ from aquasec.utilities import set_bool
 
 
 class Config:  # pylint: disable=missing-class-docstring
-    API_KEY = os.getenv("AQUA_API_KEY", "")
-    API_SECRET = os.getenv("AQUA_API_SECRET", "")
+    WORKLOAD_API_KEY = os.getenv("AQUA_WORKLOAD_API_KEY", "")
+    WORKLOAD_API_SECRET = os.getenv("AQUA_WORKLOAD_API_SECRET", "")
+    CSPM_API_KEY = os.getenv("AQUA_CSPM_API_KEY", "")
+    CSPM_API_SECRET = os.getenv("AQUA_CSPM_API_SECRET", "")
     API_URL = "https://api.cloudsploit.com/v2"
     API_VERSION = os.getenv("AQUA_API_VERSION", 'v2')
     LOGNAME = os.getenv("AQUA_LOGNAME", "aquasec.log")

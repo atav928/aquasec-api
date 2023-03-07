@@ -48,7 +48,6 @@ class WorkloadAuth:
         self.TOKEN_URL: str = self.TOKEN_URL.format(self.api_version)
         self.api_key: str = api_key
         self._api_secret: str = api_secret
-        print(kwargs)
         self.allowed_endpoints: list = kwargs.pop("allowed_endpoints", ["ANY"])
         self.csp_roles: list = kwargs.pop("csp_roles", ["api_auditor"])
         self.payload: str = self._create_payload(allowed_endpoints=self.allowed_endpoints,
