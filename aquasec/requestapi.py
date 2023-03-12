@@ -58,6 +58,58 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
     return response.json()
 
 
+def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
+    """_summary_
+
+    Args:
+        workload_auth (WorkloadAuth): _description_
+        url (str): url to call
+        method (str): Requests Type
+
+    Raises:
+        AquaSecPermission: Missing Parameter
+
+    Returns:
+        dict: response dictionary
+    """
+    params: dict = {
+        "page": 1,
+        "pagesize": 1000
+    }
+    try:
+        url: str = kwargs.pop('url')
+        method: str = kwargs.pop('method')
+    except KeyError as err:
+        error = reformat_exception(err)
+        aquasec_logger.error("AquaSecPermission: %s", error)
+        raise AquaSecPermission(error)  # pylint: disable=raise-missing-from
+    response = {
+        "result": [],
+        "page": 0,
+        "pagesize": 0,
+        "count": 0
+    }
+    result: list = []
+    iterations: int = 0
+    while (len(result) < response["count"] or iterations == 0):
+        try:
+            response = aqua_workload_request(workload_auth=workload_auth,
+                                             url=url,
+                                             method=method,
+                                             params=params,
+                                             **kwargs)
+            if response['result']:
+                result = result + response['result']
+            params = {**params, **{"page": params["page"] + 1}}
+            iterations += 1
+        except Exception as err:  # pylint: disable=broad-exception-caught
+            error = reformat_exception(err)
+            aquasec_logger.error("Unable to get %s data error=%s", url, error)
+            return {"error": error}
+    response['result'] = result
+    return response
+
+
 def aqua_cloudsploit_request(url: str, method: str, **kwargs) -> Dict[str, Any]:
     """_summary_
 
