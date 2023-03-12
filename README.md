@@ -74,6 +74,8 @@ You are able to directly interact with the SDK and pass the variables required t
     AQUA_LOGLOCATION: "/tmp/logs/"
     ```
 
+> __NOTE:__ The Certificate is the verification used for the RestAPI calls. This will be called upon unless you specify in your own _verify=_ in your method call. Just like in the Requests module this is a (str|bool) value that defaults to _True_. If it is a string it will confirm that the string is a file and therefore the location of a specific cert to be verified against a Proxy forwarder.
+
 ## Usage
 
 ### Workload Protection
@@ -145,13 +147,14 @@ __Common useful endpoints:__
 * Get all hosts (I increase the size based on my company count; you can build out a refresh to get everything until the count equals the amount of records returned)
 
     ```bash
-    >> all_hosts = api.get.workload_protection(url_path='hosts', api_version='v1', params={'pagesize: 1000})
+    >> all_hosts = api.get.workload_protection(url_path='hosts', api_version='v1', get_all=True)
     ```
 
 * Get CIS Benchmark Results
 
     ```bash
-    >> cis_benchmark = api.get.workload_protection(url_path='risk/bench/{id}/bench_results)
+    >> host_id = all_hosts['result'][0]['id']
+    >> cis_benchmark = api.get.workload_protection(url_path=f'risks/bench/{host_id}/bench_results')
     ```
 
 * Get Kubernetes Resources
@@ -174,6 +177,12 @@ __Common useful endpoints:__
 
 ## Release Info
 
+### v0.0.2
+
+* added retrieve_full_list() which allows get to retrieve all items.
+* if _"get_all"_ is specified in api.get.workload_protection() the variable will retrieve all possible values.
+* updates to README.md, fixed a few typos.
+
 ### v0.0.1
 
 * WorkloadAuth - usage to get auth token for workload tasks
@@ -195,5 +204,7 @@ __Common useful endpoints:__
 | __0.0.1__ | __rc3__ | issues with dataclasses and requirements |
 | __0.0.1__ | __rc4__ | issues with dataclasses and requirements |
 | __0.0.1__ | __rc8__ | final release that solves how the auth works for CSPM and Workload Protection |
+| __0.0.2__ | __a1__ | Updated readme testing some additional modeling and possible integration scripts |
+| __0.0.2__ | __a2__ | Added ability to retrieve all functions leveraging paging |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.

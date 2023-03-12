@@ -3,7 +3,7 @@
 from aquasec import config, logger
 
 from aquasec.auth import refresh_workload_token, WorkloadAuth
-from aquasec.requestapi import aqua_cloudsploit_request, aqua_workload_request
+from aquasec.requestapi import (aqua_cloudsploit_request, aqua_workload_request, retrieve_full_list)
 from aquasec.utilities import reformat_exception
 
 logger.addLogger(__name__)
@@ -17,6 +17,8 @@ class Get:
     """
     _parent_class = None
     method: str = "GET"
+
+    all_hosts: list = []
 
     def cspm(self, url_path: str, **kwargs):
         """Creates CSPM endpoint. Pass any paremters required to complete the Request.
@@ -54,6 +56,7 @@ class Get:
         try:
             api_version: str = kwargs.pop(
                 'api_version', self._parent_class.workload_auth.api_version)  # type:ignore
+            get_all: bool = kwargs.pop('get_all', False)
         except KeyError as err:
             error = reformat_exception(err)
             aquasec_logger.error("AquaSecMissingParam: %s", error)
@@ -62,10 +65,16 @@ class Get:
                                        url_path=url_path,
                                        api_version=api_version)  # type: ignore
         aquasec_logger.info("Created Workload URL=%s", url)
-        response = aqua_workload_request(self._parent_class.workload_auth,  # type: ignore
-                                         url=url,
-                                         method=self.method,
-                                         **kwargs)
+        if not get_all:
+            response = aqua_workload_request(self._parent_class.workload_auth,  # type: ignore
+                                             url=url,
+                                             method=self.method,
+                                             **kwargs)
+        else:
+            response = retrieve_full_list(self._parent_class.workload_auth,  # type: ignore
+                                          url=url,
+                                          method=self.method,
+                                          **kwargs)
         aquasec_logger.info("Retrieved Inforomation from Workload Protection")
         return response
 
