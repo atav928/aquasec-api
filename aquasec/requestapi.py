@@ -53,7 +53,7 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
                                 verify=verify,
                                 timeout=timeout)
     aquasec_logger.debug("Response Code: %s| Full Response: %s",
-                         str(response.status_code), response.text)
+                         str(response.status_code), response.text.rstrip())
     api_raise_error(response=response)
     return response.json()
 
@@ -153,7 +153,7 @@ def api_raise_error(response: Response) -> None:
         message = response.json().get("message", "Permission Denied")
         aquasec_logger.error("AquaSecPermission: %s", message)
         raise AquaSecPermission(message)
-    if not (response.status_code >= 200 or response.status_code < 299):
+    if not (response.status_code >= 200 and response.status_code < 299):
         aquasec_logger.error("Status Code: %s| Error: %s", str(
             response.status_code), response.json())
         raise AquaSecAPIError(response.json())

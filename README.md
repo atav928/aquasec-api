@@ -172,7 +172,13 @@ __Common useful endpoints:__
 * Get Containers
 
     ```bash
-    >>> all_containers = api.get.workload_protection(url_path="containers", api_version='v2', params={'pagesize': 3000})
+    >>> all_containers = api.get.workload_protection(url_path="containers", api_version='v2', get_all=True)
+    ```
+
+* Get CIS Bench Report
+
+    ```bash
+    >>> kube_report = api.get.bench_reports(report_type='kube_bench', cluser_name='production')
     ```
 
 ## Release Info
@@ -182,6 +188,7 @@ __Common useful endpoints:__
 * added retrieve_full_list() which allows get to retrieve all items.
 * if _"get_all"_ is specified in api.get.workload_protection() the variable will retrieve all possible values.
 * updates to README.md, fixed a few typos.
+* added ability to retrieve CIS bench reports directly without the need to run mulitple calls.
 
 ### v0.0.1
 
@@ -206,5 +213,6 @@ __Common useful endpoints:__
 | __0.0.1__ | __rc8__ | final release that solves how the auth works for CSPM and Workload Protection |
 | __0.0.2__ | __a1__ | Updated readme testing some additional modeling and possible integration scripts |
 | __0.0.2__ | __a2__ | Added ability to retrieve all functions leveraging paging |
+| __0.0.2__ | __a3__ | Added CIS benchmark reports |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.
