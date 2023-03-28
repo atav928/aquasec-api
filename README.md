@@ -96,6 +96,14 @@ INFO    : Created Workload URL=https://1234567890ab.cloud.aquasec.com/api/v2/lic
 DEBUG   : Response Code: 200| Full Response: {"type":"Standard","organization":"ACME Corp, Inc.","account_id":"","client_name":"user@ACME Corp, Inc.-2023-03-29-StandardS","name":"","email":"john.doe@acme.com","num_agents":0,"num_microenforcers":0,"num_hostenforcers":0,"num_images":0,"num_functions":10000,"num_advanced_functions":0,"num_pas":-1,"num_code_repositories":0,"license_issue_date":1641772800,"license_exp_date":1768003199,"non_prod":false,"approved":true,"external_token":"","strict":false,"level":"Advanced","vpatch":true,"vpatch_coverage":0,"malware_protection":true,"tier":"","agents_running":0,"images_scanned":0,"num_protected_kube_nodes":0,"resource_status":{"Enforcers":"valid","Kubernetes cluster protection":"valid","MicroEnforcers":"valid","Repositories":"valid","VM Enforcers":"valid"}}
 ```
 
+__Bypass OS or YAML Configs:__
+
+```bash
+>>> from aquasec.api import API
+>>> api = API(api_key="7d6c02219a99", api_secret="0b3b928a1acd4c2580583cc160f49f5e",api_csp_roles=["CSP_USER"],allowed_endpoints=["ANY"])
+INFO    : Created WorkloadAuth Token for URL https://1234567890ab.cloud.aquasec.com
+```
+
 __Common Params:__
 
 ```json
@@ -200,7 +208,7 @@ __Common useful endpoints:__
 * added ability to retrieve CIS bench reports directly without the need to run mulitple calls.
 * Fixed issue with _"get_all"_ where it would go into an infinant loop since the count return did not always match the results.
 * Provides direct ability to call on all reports or individual reports.
-
+* Fixed issue where passing api_key or api_secret when creating an API Object would not properly create the WorkloadAuth.
 
 ### v0.0.1
 
@@ -226,5 +234,6 @@ __Common useful endpoints:__
 | __0.0.2__ | __a1__ | Updated readme testing some additional modeling and possible integration scripts |
 | __0.0.2__ | __a2__ | Added ability to retrieve all functions leveraging paging |
 | __0.0.2__ | __a3__ | Added CIS benchmark reports, Fix bug with infinate get_all |
+| __0.0.2__ | __rc1__ | Bug with providing direct api information into api function with WorkloadAuth |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.
