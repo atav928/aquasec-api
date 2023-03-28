@@ -97,8 +97,6 @@ class WorkloadAuth:
         """
         #### Decode JWT Token for URL ###
         decoded_parse = jwt.decode(token, options={"verify_signature": False})
-        # decoded_parse = jwt.decode(token, config._API_SECRET, algorithms=["HS256"])
-        # print(f"{decoded_parse=}")
         self.aqua_user_id = decoded_parse['user_id']
         self.account_id = decoded_parse['account_id']
         self.account_admin = decoded_parse['account_admin']
