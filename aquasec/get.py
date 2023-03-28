@@ -148,8 +148,7 @@ class Get:
         if report_type in ['all', 'full']:
             aquasec_logger.info("Retrieved full bench report")
             return bench_report
-        # TODO: Getting failure when tying to pull specific priarily arond the bench_report get call
-        #  see what the issue may be as it says it's a string return.
+        # Gets specific report
         specific_bench_report: dict = {identifier: {report_type: {}}
                                        for identifier in bench_report}
         for _ in list(bench_report):

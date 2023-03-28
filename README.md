@@ -201,6 +201,7 @@ __Common useful endpoints:__
 * Fixed issue with _"get_all"_ where it would go into an infinant loop since the count return did not always match the results.
 * Provides direct ability to call on all reports or individual reports.
 
+
 ### v0.0.1
 
 * WorkloadAuth - usage to get auth token for workload tasks
