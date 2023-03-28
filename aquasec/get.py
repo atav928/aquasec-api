@@ -150,11 +150,10 @@ class Get:
             return bench_report
         # TODO: Getting failure when tying to pull specific priarily arond the bench_report get call
         #  see what the issue may be as it says it's a string return.
-        specific_bench_report: dict = {identifier: f"{report_type}_report"
+        specific_bench_report: dict = {identifier: {report_type: {}}
                                        for identifier in bench_report}
         for _ in list(bench_report):
-            specific_bench_report[_][f"{report_type}_report"] = bench_report[_].get(
-                f"{report_type}_report", {})
+            specific_bench_report[_][f"{report_type}"] = bench_report[_].get(report_type, {})
         aquasec_logger.info("Retrieved %s_report for specified hosts", report_type)
         return specific_bench_report
 

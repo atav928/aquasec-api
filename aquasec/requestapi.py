@@ -52,7 +52,7 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
                                 params=params,
                                 verify=verify,
                                 timeout=timeout)
-    aquasec_logger.debug("Response Code: %s| Full Response: %s",
+    aquasec_logger.debug("Response Code=%s|Full Response=%s",
                          str(response.status_code), response.text.rstrip())
     api_raise_error(response=response)
     return response.json()
@@ -91,7 +91,7 @@ def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
     }
     result: list = []
     iterations: int = 0
-    while (len(result) < response["count"] or iterations == 0):
+    while (len(result) <= response["count"] or iterations == 0):
         try:
             response = aqua_workload_request(workload_auth=workload_auth,
                                              url=url,
@@ -100,6 +100,9 @@ def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
                                              **kwargs)
             if response['result']:
                 result = result + response['result']
+                aquasec_logger.debug("result_length=%s|result_count=%s", str(len(result)), str(response["count"]))
+            if not response['result']:
+                break
             params = {**params, **{"page": params["page"] + 1}}
             iterations += 1
         except Exception as err:  # pylint: disable=broad-exception-caught

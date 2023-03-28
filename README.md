@@ -175,10 +175,19 @@ __Common useful endpoints:__
     >>> all_containers = api.get.workload_protection(url_path="containers", api_version='v2', get_all=True)
     ```
 
-* Get CIS Bench Report
+* Get CIS Bench Reports Directly
 
     ```bash
+    # Kube Report Only for Production Cluster
     >>> kube_report = api.get.bench_reports(report_type='kube_bench', cluser_name='production')
+    # Kube Report for all Clusters
+    >>> kube_report = api.get.bench_reports(report_type='kube_bench')
+    # Linux Report Only
+    >>> all_linux_report = api.get.bench_reports(report_type='linux')
+    # disa_stig Report
+    >>> disa_stig_report = api.get.bench_reports(report_type='disa_stig')
+    # Full CIS Benchmark Report on all Hosts
+    >>> full_cis_report = api.get.bench_reports(report_type='all')
     ```
 
 ## Release Info
@@ -189,6 +198,8 @@ __Common useful endpoints:__
 * if _"get_all"_ is specified in api.get.workload_protection() the variable will retrieve all possible values.
 * updates to README.md, fixed a few typos.
 * added ability to retrieve CIS bench reports directly without the need to run mulitple calls.
+* Fixed issue with _"get_all"_ where it would go into an infinant loop since the count return did not always match the results.
+* Provides direct ability to call on all reports or individual reports.
 
 ### v0.0.1
 
@@ -213,6 +224,6 @@ __Common useful endpoints:__
 | __0.0.1__ | __rc8__ | final release that solves how the auth works for CSPM and Workload Protection |
 | __0.0.2__ | __a1__ | Updated readme testing some additional modeling and possible integration scripts |
 | __0.0.2__ | __a2__ | Added ability to retrieve all functions leveraging paging |
-| __0.0.2__ | __a3__ | Added CIS benchmark reports |
+| __0.0.2__ | __a3__ | Added CIS benchmark reports, Fix bug with infinate get_all |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.
