@@ -9,6 +9,10 @@ class AquaSecAuthError(AquaSecError):
     """Authorization Error"""
 
 
+class AquaSecWrongParam(AquaSecError):
+    """Incorrect or Invalid parameters"""
+
+
 class AquaSecMissingParam(AquaSecError):
     """Missing parameters"""
 

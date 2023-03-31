@@ -2,3 +2,4 @@ requests
 pyjwt
 dataclasses
 pyyaml
+dict_to_dataclass

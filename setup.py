@@ -19,13 +19,14 @@ setup(
     name='aquasec-api',
     version=__version__,  # type: ignore
     author="atav928",
+    description='Aqua Security SDK to pull data from Aquasec Tenant and CSPM for auditing',
     author_email="dev@tavnets.com",
     maintainer_email="dev@tavnets.com",
     packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
     url='https://github.com/atav928/aquasec-api',
-    keywords=['aquasec'],
+    keywords=['aquasec', 'aqua security', 'workload protection'],
     long_description=readme,
     long_description_content_type='text/markdown',
 )  # pragma: no cover
