@@ -74,6 +74,8 @@ You are able to directly interact with the SDK and pass the variables required t
     AQUA_LOGLOCATION: "/tmp/logs/"
     ```
 
+> __NOTE:__ The Certificate is the verification used for the RestAPI calls. This will be called upon unless you specify in your own _verify=_ in your method call. Just like in the Requests module this is a (str|bool) value that defaults to _True_. If it is a string it will confirm that the string is a file and therefore the location of a specific cert to be verified against a Proxy forwarder.
+
 ## Usage
 
 ### Workload Protection
@@ -92,6 +94,14 @@ INFO    : Created WorkloadAuth Token for URL https://1234567890ab.cloud.aquasec.
 >>> api.get.workload_protection(url_path='license')
 INFO    : Created Workload URL=https://1234567890ab.cloud.aquasec.com/api/v2/license
 DEBUG   : Response Code: 200| Full Response: {"type":"Standard","organization":"ACME Corp, Inc.","account_id":"","client_name":"user@ACME Corp, Inc.-2023-03-29-StandardS","name":"","email":"john.doe@acme.com","num_agents":0,"num_microenforcers":0,"num_hostenforcers":0,"num_images":0,"num_functions":10000,"num_advanced_functions":0,"num_pas":-1,"num_code_repositories":0,"license_issue_date":1641772800,"license_exp_date":1768003199,"non_prod":false,"approved":true,"external_token":"","strict":false,"level":"Advanced","vpatch":true,"vpatch_coverage":0,"malware_protection":true,"tier":"","agents_running":0,"images_scanned":0,"num_protected_kube_nodes":0,"resource_status":{"Enforcers":"valid","Kubernetes cluster protection":"valid","MicroEnforcers":"valid","Repositories":"valid","VM Enforcers":"valid"}}
+```
+
+__Bypass OS or YAML Configs:__
+
+```bash
+>>> from aquasec.api import API
+>>> api = API(api_key="7d6c02219a99", api_secret="0b3b928a1acd4c2580583cc160f49f5e",api_csp_roles=["CSP_USER"],allowed_endpoints=["ANY"])
+INFO    : Created WorkloadAuth Token for URL https://1234567890ab.cloud.aquasec.com
 ```
 
 __Common Params:__
@@ -145,13 +155,14 @@ __Common useful endpoints:__
 * Get all hosts (I increase the size based on my company count; you can build out a refresh to get everything until the count equals the amount of records returned)
 
     ```bash
-    >> all_hosts = api.get.workload_protection(url_path='hosts', api_version='v1', params={'pagesize: 1000})
+    >> all_hosts = api.get.workload_protection(url_path='hosts', api_version='v1', get_all=True)
     ```
 
 * Get CIS Benchmark Results
 
     ```bash
-    >> cis_benchmark = api.get.workload_protection(url_path='risk/bench/{id}/bench_results)
+    >> host_id = all_hosts['result'][0]['id']
+    >> cis_benchmark = api.get.workload_protection(url_path=f'risks/bench/{host_id}/bench_results')
     ```
 
 * Get Kubernetes Resources
@@ -169,10 +180,35 @@ __Common useful endpoints:__
 * Get Containers
 
     ```bash
-    >>> all_containers = api.get.workload_protection(url_path="containers", api_version='v2', params={'pagesize': 3000})
+    >>> all_containers = api.get.workload_protection(url_path="containers", api_version='v2', get_all=True)
+    ```
+
+* Get CIS Bench Reports Directly
+
+    ```bash
+    # Kube Report Only for Production Cluster
+    >>> kube_report = api.get.bench_reports(report_type='kube_bench', cluser_name='production')
+    # Kube Report for all Clusters
+    >>> kube_report = api.get.bench_reports(report_type='kube_bench')
+    # Linux Report Only
+    >>> all_linux_report = api.get.bench_reports(report_type='linux')
+    # disa_stig Report
+    >>> disa_stig_report = api.get.bench_reports(report_type='disa_stig')
+    # Full CIS Benchmark Report on all Hosts
+    >>> full_cis_report = api.get.bench_reports(report_type='all')
     ```
 
 ## Release Info
+
+### v0.0.2
+
+* added retrieve_full_list() which allows get to retrieve all items.
+* if _"get_all"_ is specified in api.get.workload_protection() the variable will retrieve all possible values.
+* updates to README.md, fixed a few typos.
+* added ability to retrieve CIS bench reports directly without the need to run mulitple calls.
+* Fixed issue with _"get_all"_ where it would go into an infinant loop since the count return did not always match the results.
+* Provides direct ability to call on all reports or individual reports.
+* Fixed issue where passing api_key or api_secret when creating an API Object would not properly create the WorkloadAuth.
 
 ### v0.0.1
 
@@ -195,5 +231,10 @@ __Common useful endpoints:__
 | __0.0.1__ | __rc3__ | issues with dataclasses and requirements |
 | __0.0.1__ | __rc4__ | issues with dataclasses and requirements |
 | __0.0.1__ | __rc8__ | final release that solves how the auth works for CSPM and Workload Protection |
+| __0.0.2__ | __a1__ | Updated readme testing some additional modeling and possible integration scripts |
+| __0.0.2__ | __a2__ | Added ability to retrieve all functions leveraging paging |
+| __0.0.2__ | __a3__ | Added CIS benchmark reports, Fix bug with infinate get_all |
+| __0.0.2__ | __rc1__ | Bug with providing direct api information into api function with WorkloadAuth |
+| __0.0.2__ | __final__ | completed orchestration of bench report and standard get workload checks |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.

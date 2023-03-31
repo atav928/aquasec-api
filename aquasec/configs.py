@@ -19,3 +19,17 @@ class Config:  # pylint: disable=missing-class-docstring
     SET_LOG = set_bool(os.getenv("AQUA_SET_LOG", "true"))
     ENCODING = "utf-8"
     CERT = set_bool(os.getenv("AQUA_CERT", 'true'))  # pylint: disable=invalid-name
+    WORKLOAD_URL_PATHS: dict = {
+        "hosts": {
+            "path": "hosts",
+            "version": "v1"
+        },
+        "host_bench_report": {
+            "path": "risks/bench/{}/bench_results",
+            "version": "v2"
+        },
+        "containers": {
+            "path": "containers",
+            "version": "v2"
+        }
+    }

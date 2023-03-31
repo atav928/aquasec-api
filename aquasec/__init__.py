@@ -50,9 +50,10 @@ def return_workload_auth(**kwargs) -> WorkloadAuth:
     workload_auth: WorkloadAuth = kwargs.pop('workload_auth', "")
     if not workload_auth:
         if (kwargs.get('api_key') and kwargs.get('api_secret')):
-            workload_auth = WorkloadAuth(kwargs['api_key'],
-                                         kwargs['api_secret'],
-                                         kwargs.get('api_version', 'v2'),
+            # remove possible kwargs values
+            workload_auth = WorkloadAuth(api_key=kwargs.pop('api_key'),
+                                         api_secret=kwargs.pop('api_secret'),
+                                         api_version=kwargs.pop('api_version', 'v2'),
                                          **kwargs)
         else:
             workload_auth = WorkloadAuth(config.WORKLOAD_API_KEY,
