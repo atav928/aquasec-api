@@ -235,5 +235,6 @@ __Common useful endpoints:__
 | __0.0.2__ | __a2__ | Added ability to retrieve all functions leveraging paging |
 | __0.0.2__ | __a3__ | Added CIS benchmark reports, Fix bug with infinate get_all |
 | __0.0.2__ | __rc1__ | Bug with providing direct api information into api function with WorkloadAuth |
+| __0.0.2__ | __final__ | completed orchestration of bench report and standard get workload checks |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.
