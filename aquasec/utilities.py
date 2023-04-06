@@ -2,7 +2,10 @@
 
 from pathlib import Path
 
-def set_bool(value: str, default = False):
+from aquasec.auth import WorkloadAuth, refresh_workload_token
+
+
+def set_bool(value: str, default=False):
     """sets bool value when pulling string from os env
 
     Args:
@@ -24,6 +27,7 @@ def set_bool(value: str, default = False):
             value_bool = value
     return value_bool
 
+
 def reformat_exception(error: Exception) -> str:
     """Reformates Exception to print out as a string pass for logging
 
@@ -34,3 +38,25 @@ def reformat_exception(error: Exception) -> str:
         str: _description_
     """
     return f"{type(error).__name__}: {str(error)}" if error else ""
+
+
+class UrlUtils:
+    @staticmethod
+    @refresh_workload_token
+    def create_workload_url(workload_auth: WorkloadAuth,
+                            workload_url: str,
+                            url_path: str,
+                            api_version: str) -> str:
+        """_summary_
+
+        Args:
+            workload_auth (WorkloadAuth): _description_
+            workload_url (str): _description_
+            url_path (str): _description_
+            api_version (str): _description_
+
+        Returns:
+            str: _description_
+        """
+        url = workload_url.format(workload_auth.aqua_url, api_version, url_path)
+        return url
