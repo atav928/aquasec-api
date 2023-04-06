@@ -1,4 +1,5 @@
 """Request API"""
+import json
 from typing import Any, Dict
 import requests
 from requests import Response
@@ -41,21 +42,28 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
         timeout: int = kwargs.pop('timeout', 60)
         verify = kwargs.pop('verify', config.CERT)
         params: dict = kwargs.pop('params', {})
+        data: dict = kwargs.pop('data', None)
     except KeyError as err:
         error = reformat_exception(err)
         aquasec_logger.error("AquaSecMissingParam: %s", error)
         raise AquaSecMissingParam(error)  # pylint: disable=raise-missing-from
+    if data:
+        data = json.dumps(data)
     response = requests.request(method=method,
                                 url=url,
                                 headers=workload_auth.headers,
-                                # data=data,
+                                data=data,
                                 params=params,
                                 verify=verify,
                                 timeout=timeout)
     aquasec_logger.debug("Response Code=%s|Full Response=%s",
                          str(response.status_code), response.text.rstrip())
     api_raise_error(response=response)
-    return response.json()
+    if response.status_code == 204:
+        json_response = {"message": "Data Created", "code": response.status_code}
+    else:
+        json_response = response.json()
+    return json_response
 
 
 def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
@@ -160,3 +168,24 @@ def api_raise_error(response: Response) -> None:
         aquasec_logger.error("Status Code: %s| Error: %s", str(
             response.status_code), response.json())
         raise AquaSecAPIError(response.json())
+
+
+Traceback (most recent call last):
+  File "/.env/lib/python3.8/site-packages/requests/models.py", line 971, in json
+    return complexjson.loads(self.text, **kwargs)
+  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/__init__.py", line 357, in loads
+    return _default_decoder.decode(s)
+  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "test_call.py", line 41, in <module>
+    print(response.json())
+  File "/.env/lib/python3.8/site-packages/requests/models.py", line 975, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
