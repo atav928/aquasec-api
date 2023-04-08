@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 """Get Method"""
 
 from aquasec import config, logger
@@ -67,16 +68,15 @@ class Get:
                                        url_path=url_path,
                                        api_version=api_version)  # type: ignore
         aquasec_logger.info("Created Workload URL=%s", url)
-        if not get_all:
-            response = aqua_workload_request(self._parent_class.workload_auth,  # type: ignore
-                                             url=url,
-                                             method=self.method,
-                                             **kwargs)
-        else:
-            response = retrieve_full_list(self._parent_class.workload_auth,  # type: ignore
-                                          url=url,
-                                          method=self.method,
-                                          **kwargs)
+        # retrieve response either for a single page, or entire result through a looping function
+        response = aqua_workload_request(self._parent_class.workload_auth,  # type: ignore
+                                         url=url,
+                                         method=self.method,
+                                         **kwargs) if not get_all else retrieve_full_list(self._parent_class.workload_auth,  # type: ignore
+                                                                                          url=url,
+                                                                                          method=self.method,
+                                                                                          **kwargs)
+        # Log out entry
         aquasec_logger.info("Retrieved Inforomation from Workload Protection")
         return response
 

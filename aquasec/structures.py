@@ -1,21 +1,38 @@
 """Dataclass Structures"""
 
-import time
 from dataclasses import dataclass
-from typing import List, Dict, Any
+from typing import List
 
 from aquasec.exceptions import AquaSecMissingParam
+from aquasec.utilities import nested_dataclass
 
 
 @dataclass
+class InboundNetwork:
+    allow: str
+    resource: str
+    port_range: str
+    resource_type: str
+    is_cloud_metadata_rule: bool
+
+
+@dataclass
+class OutboundNetwork:
+    allow: str
+    resource: str
+    port_range: str
+    resource_type: str
+    is_cloud_metadata_rule: bool
+
+@nested_dataclass
 class FirewallPolicy:
     author: str
     name: str
     type: str
     version: str
     # TODO: Use Nested Funcations
-    inbound_networks: List[Dict[str, Any]]
-    outbound_networks: List[Dict[str, Any]]
+    inbound_networks: List[InboundNetwork]
+    outbound_networks: List[OutboundNetwork]
     description: str = ""
     block_icmp_ping: bool = True
     block_metadata_service: bool = True

@@ -67,7 +67,7 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
 
 
 def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
-    """_summary_
+    """Retrieves fulll list of requirements based on multiple calls
 
     Args:
         workload_auth (WorkloadAuth): _description_
@@ -108,7 +108,8 @@ def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
                                              **kwargs)
             if response['result']:
                 result = result + response['result']
-                aquasec_logger.debug("result_length=%s|result_count=%s", str(len(result)), str(response["count"]))
+                aquasec_logger.debug("result_length=%s|result_count=%s",
+                                     str(len(result)), str(response["count"]))
             if not response['result']:
                 break
             params = {**params, **{"page": params["page"] + 1}}
@@ -168,24 +169,3 @@ def api_raise_error(response: Response) -> None:
         aquasec_logger.error("Status Code: %s| Error: %s", str(
             response.status_code), response.json())
         raise AquaSecAPIError(response.json())
-
-
-Traceback (most recent call last):
-  File "/.env/lib/python3.8/site-packages/requests/models.py", line 971, in json
-    return complexjson.loads(self.text, **kwargs)
-  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/__init__.py", line 357, in loads
-    return _default_decoder.decode(s)
-  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/decoder.py", line 337, in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/decoder.py", line 355, in raw_decode
-    raise JSONDecodeError("Expecting value", s, err.value) from None
-json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "test_call.py", line 41, in <module>
-    print(response.json())
-  File "/.env/lib/python3.8/site-packages/requests/models.py", line 975, in json
-    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
-requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
