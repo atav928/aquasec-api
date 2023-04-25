@@ -1,5 +1,5 @@
-requests
-pyjwt
-dataclasses
-pyyaml
-dict_to_dataclass
+requests>=2.26.0
+PyJWT~=2.6.0
+dataclasses>=0.6
+PyYAML>=6.0
+dict_to_dataclass~=0.0.8
