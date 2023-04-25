@@ -1,0 +1,36 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=40.9.0", "wheel", "attrs"]
+
+[project]
+name = "aquasec-api"
+authors = [
+    {name = "atav928", email = "dev@tavnets.com"},
+]
+description = "Aqua Security SDK to pull data from Aquasec Tenant and CSPM for auditing"
+requires-python = ">=3.8, <4"
+keywords = ['aquasec', 'aqua security', 'workload protection']
+license = {file = "LICENSE"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "requests>=2.26.0",
+    "PyJWT~=2.6.0",
+    "dataclasses>=0.6",
+    "PyYAML>=6.0",
+    "dict_to_dataclass~=0.0.8",
+    'importlib-metadata; python_version<"3.8"',
+]
+dynamic = ["version", "readme"]
+
+[project.urls]
+repository = "https://github.com/atav928/aquasec-api"
+homepage = "https://www.tavnets.com/blog/aquasec/"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md", "SECURITY.md"], content-type = "text/markdown"}
+version = {attr = "aquasec.__version__"}
+
+[tools.setuptools.packages]
+find = {}
