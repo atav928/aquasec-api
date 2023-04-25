@@ -4,6 +4,8 @@
 from aquasec import logger, config, return_workload_auth
 from aquasec.get import Get
 from aquasec.post import Post
+from aquasec.delete import Delete
+from aquasec.put import Put
 from aquasec.utilities import reformat_exception
 from aquasec.exceptions import (AquaSecPermission, AquaSecAPIError)
 
@@ -18,7 +20,7 @@ class API:
     """
     cloudsploit_url: str = "https://api.cloudsploit.com/{}/{}"
     workload_url: str = "{}/api/{}/{}"
-    api_version: str = "" # set on initialization
+    api_version: str = ""  # set on initialization
     # Endpoints for CSPM going away from this
     # TODO: Remove the endpoint capability and just use the direct csmp get()
     endpoint_alerts: str = "alerts"
@@ -56,6 +58,8 @@ class API:
         subclasses = self._subclass_container()
         self.get = subclasses['get']()
         self.post = subclasses['post']()
+        self.put = subclasses['put']()
+        self.delete = subclasses['delete']()
 
     def list_supported_urls(self) -> dict:
         """Create a dictionary of supported endpoint URLs
@@ -90,4 +94,14 @@ class API:
             def __init__(self):
                 self._parent_class = _parent_class
         return_object['post'] = PostWrapper
+
+        class PutWrapper(Put):
+            def __inti__(self):
+                self._parent_class = _parent_class
+        return_object['put'] = PutWrapper
+
+        class DeleteWrapper(Delete):
+            def __init__(self):
+                self._parent_class = _parent_class
+        return_object['delete'] = DeleteWrapper
         return return_object

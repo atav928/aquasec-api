@@ -200,6 +200,15 @@ __Common useful endpoints:__
 
 ## Release Info
 
+### v0.0.3
+
+* Added ability to POST
+* Adding PUT
+* Additional Datastructures
+* Additional Delete Functionality
+* Introducing Orchestration on Actions
+* Bug in response code when we POST and possibly PUT an object; no json is returned just a 204. This breaks the standard return expectation. Raised issue with AquaSec. Till than buillt a way to handle it safely and introducted a message response to those responses.
+
 ### v0.0.2
 
 * added retrieve_full_list() which allows get to retrieve all items.
@@ -236,5 +245,6 @@ __Common useful endpoints:__
 | __0.0.2__ | __a3__ | Added CIS benchmark reports, Fix bug with infinate get_all |
 | __0.0.2__ | __rc1__ | Bug with providing direct api information into api function with WorkloadAuth |
 | __0.0.2__ | __final__ | completed orchestration of bench report and standard get workload checks |
+| __0.0.3__ | __a1__ | Intro to POST, PUT, DELETE and adding some datastructures for creating and manipluating AquaSec |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.
