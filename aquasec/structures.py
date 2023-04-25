@@ -1,5 +1,6 @@
 """Dataclass Structures"""
 
+
 from dataclasses import dataclass
 from typing import List
 
@@ -25,6 +26,7 @@ class OutboundNetwork:
     is_cloud_metadata_rule: bool
 
 @nested_dataclass
+
 class FirewallPolicy:
     author: str
     name: str
@@ -33,6 +35,7 @@ class FirewallPolicy:
     # TODO: Use Nested Funcations
     inbound_networks: List[InboundNetwork]
     outbound_networks: List[OutboundNetwork]
+
     description: str = ""
     block_icmp_ping: bool = True
     block_metadata_service: bool = True

@@ -40,6 +40,7 @@ def reformat_exception(error: Exception) -> str:
     """
     return f"{type(error).__name__}: {str(error)}" if error else ""
 
+
 def nested_dataclass(*args, **kwargs):
     """[summary]
     """

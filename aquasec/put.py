@@ -2,7 +2,9 @@
 
 from dataclasses import asdict
 from aquasec import config, logger
+
 from aquasec.statics import DATA_TYPES
+
 from aquasec.requestapi import aqua_workload_request
 from aquasec.structures import FirewallPolicy
 from aquasec.utilities import UrlUtils
