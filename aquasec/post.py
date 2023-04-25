@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 """Post Method"""
 
 from dataclasses import asdict

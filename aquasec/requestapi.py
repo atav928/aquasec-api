@@ -67,7 +67,7 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
 
 
 def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
-    """_summary_
+    """Retrieves fulll list of requirements based on multiple calls
 
     Args:
         workload_auth (WorkloadAuth): _description_
@@ -108,7 +108,8 @@ def retrieve_full_list(workload_auth: WorkloadAuth, **kwargs):
                                              **kwargs)
             if response['result']:
                 result = result + response['result']
-                aquasec_logger.debug("result_length=%s|result_count=%s", str(len(result)), str(response["count"]))
+                aquasec_logger.debug("result_length=%s|result_count=%s",
+                                     str(len(result)), str(response["count"]))
             if not response['result']:
                 break
             params = {**params, **{"page": params["page"] + 1}}

@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 """Get Method"""
 
 from aquasec import config, logger
@@ -5,7 +6,7 @@ from aquasec import config, logger
 from aquasec.auth import (refresh_workload_token, WorkloadAuth)
 from aquasec.statics import BENCH_REPORTS
 from aquasec.requestapi import (aqua_cloudsploit_request, aqua_workload_request, retrieve_full_list)
-from aquasec.utilities import reformat_exception
+from aquasec.utilities import (reformat_exception, UrlUtils)
 from aquasec.exceptions import (AquaSecWrongParam, AquaSecAPIError)
 
 logger.addLogger(__name__)
@@ -62,21 +63,21 @@ class Get:
         except KeyError as err:
             error = reformat_exception(err)
             aquasec_logger.error("AquaSecMissingParam: %s", error)
-        url = Get._create_workload_url(self._parent_class.workload_auth,  # type: ignore
-                                       self._parent_class.workload_url,  # type:ignore
-                                       url_path=url_path,
-                                       api_version=api_version)  # type: ignore
+        url = UrlUtils.create_workload_url(self._parent_class.workload_auth,  # type: ignore
+                                           self._parent_class.workload_url,  # type:ignore
+                                           url_path=url_path,
+                                           api_version=api_version)  # type: ignore
         aquasec_logger.info("Created Workload URL=%s", url)
-        if not get_all:
-            response = aqua_workload_request(self._parent_class.workload_auth,  # type: ignore
-                                             url=url,
-                                             method=self.method,
-                                             **kwargs)
-        else:
-            response = retrieve_full_list(self._parent_class.workload_auth,  # type: ignore
-                                          url=url,
-                                          method=self.method,
-                                          **kwargs)
+        # retrieve response either for a single page, or entire result through a looping function
+        response = aqua_workload_request(self._parent_class.workload_auth,  # type: ignore
+                                         url=url,
+                                         method=self.method,
+                                         # type: ignore
+                                         **kwargs) if not get_all else retrieve_full_list(self._parent_class.workload_auth,
+                                                                                          url=url,
+                                                                                          method=self.method,
+                                                                                          **kwargs)
+        # Log out entry
         aquasec_logger.info("Retrieved Inforomation from Workload Protection")
         return response
 
@@ -168,12 +169,4 @@ class Get:
         api_version: str = kwargs.pop(
             'api_version', self._parent_class.api_version)  # type: ignore # type :ignore
         url = self._parent_class.cloudsploit_url.format(api_version, url_path)  # type: ignore
-        return url
-
-    @staticmethod
-    @refresh_workload_token
-    def _create_workload_url(
-            workload_auth: WorkloadAuth, workload_url: str, url_path: str, api_version: str) -> str:
-        url = workload_url.format(workload_auth.aqua_url, api_version, url_path)
-        aquasec_logger.debug("Created url %s", url)
         return url
