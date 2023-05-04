@@ -198,7 +198,39 @@ __Common useful endpoints:__
     >>> full_cis_report = api.get.bench_reports(report_type='all')
     ```
 
+    __NOTE:__ The report published here is a standard collecion of host key values with the raw report generated as the output. See Orchestration for adjusted reports.
+
+### Orchestration
+
+Building customized CIS Bench Reports
+
+```python
+"""Sample Bench Report"""
+
+import json
+
+from aquasec.orchestration.bench_report import BenchReport
+from aquasec.api import API
+
+# create api token
+api = API(api_key="7d6c02219a99", api_secret="0b3b928a1acd4c2580583cc160f49f5e",api_csp_roles=["CSP_USER"],allowed_endpoints=["ANY"])
+
+# create and run report Bench Object
+bench = BenchReport(api=api, report_type='all')
+bench.run()
+
+# write out report
+with open('/var/tmp/bench_report_20230501.json','w', encoding='utf-8') as f:
+    json.dump(bench.bench_report, f)
+
+```
+
 ## Release Info
+
+### v0.0.4
+
+* Added Orchestration and adjustment of bench report
+* bug with full flat_list need to build that
 
 ### v0.0.3
 
@@ -246,5 +278,6 @@ __Common useful endpoints:__
 | __0.0.2__ | __rc1__ | Bug with providing direct api information into api function with WorkloadAuth |
 | __0.0.2__ | __final__ | completed orchestration of bench report and standard get workload checks |
 | __0.0.3__ | __a1__ | Intro to POST, PUT, DELETE and adding some datastructures for creating and manipluating AquaSec |
+| __0.0.4__ | __a1__ | updates to report structure |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.
