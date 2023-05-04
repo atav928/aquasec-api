@@ -279,5 +279,6 @@ with open('/var/tmp/bench_report_20230501.json','w', encoding='utf-8') as f:
 | __0.0.2__ | __final__ | completed orchestration of bench report and standard get workload checks |
 | __0.0.3__ | __a1__ | Intro to POST, PUT, DELETE and adding some datastructures for creating and manipluating AquaSec |
 | __0.0.4__ | __a1__ | updates to report structure |
+| __0.0.4__ | __a2__ | updates to some docstring in BenchReport |
 
 __NOTE:__ Use at your own risk!!!! API as is and building on it.
