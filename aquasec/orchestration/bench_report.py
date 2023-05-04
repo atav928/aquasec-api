@@ -79,6 +79,17 @@ class ClusterHosts:
 
 
 class BenchReport:
+    """Generates a report specific to the type
+
+    Args:
+        api (API): AquaSec-API Object
+        report_type (str): Type of report. Options: ['cis', 'kube_bench', 'linux', 'openshift', 'disa_stig', 'all']
+        cluster_name (str|Optional): cluster specific name
+        report_format (str|Optional): Format of report. Options: ['list', 'flat_list', 'raw']
+
+    Raises:
+        AquaSecWrongParam: _description_
+    """
     bench_report: Any
     full_bench_report: dict = {}
     REPORT_TYPE: list = BENCH_REPORTS
