@@ -12,6 +12,7 @@ from aquasec.auth import WorkloadAuth
 from aquasec.configs import Config
 from aquasec.logging import RotatingLog
 
+from aquasec._version import __version__
 
 config = Config()
 home = expanduser("~")

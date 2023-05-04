@@ -6,7 +6,8 @@ from requests import Response
 
 from aquasec import config, logger, create_cspm_headers
 from aquasec.auth import WorkloadAuth, refresh_workload_token
-from aquasec.exceptions import (AquaSecAPIError, AquaSecMissingParam, AquaSecPermission)
+from aquasec.exceptions import (
+    AquaSecAPIError, AquaSecMissingParam, AquaSecPermission)
 from aquasec.utilities import reformat_exception
 
 logger.addLogger(__name__)
@@ -60,7 +61,8 @@ def aqua_workload_request(workload_auth: WorkloadAuth, **kwargs) -> Dict[str, An
                          str(response.status_code), response.text.rstrip())
     api_raise_error(response=response)
     if response.status_code == 204:
-        json_response = {"message": "Data Created", "code": response.status_code}
+        json_response = {"message": "Data Created",
+                         "code": response.status_code}
     else:
         json_response = response.json()
     return json_response
@@ -169,24 +171,3 @@ def api_raise_error(response: Response) -> None:
         aquasec_logger.error("Status Code: %s| Error: %s", str(
             response.status_code), response.json())
         raise AquaSecAPIError(response.json())
-
-
-Traceback (most recent call last):
-  File "/.env/lib/python3.8/site-packages/requests/models.py", line 971, in json
-    return complexjson.loads(self.text, **kwargs)
-  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/__init__.py", line 357, in loads
-    return _default_decoder.decode(s)
-  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/decoder.py", line 337, in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-  File "/Users/adamt/.pyenv/versions/3.8.15/lib/python3.8/json/decoder.py", line 355, in raw_decode
-    raise JSONDecodeError("Expecting value", s, err.value) from None
-json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "test_call.py", line 41, in <module>
-    print(response.json())
-  File "/.env/lib/python3.8/site-packages/requests/models.py", line 975, in json
-    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
-requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
