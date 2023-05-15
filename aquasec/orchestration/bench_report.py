@@ -1,70 +1,102 @@
 # pylint: disable=line-too-long
 """Create Bench Report"""
 
-from typing import Any
+from logging import Logger
+from typing import Any, Dict
 from aquasec import config, logger
 
 from aquasec.api import API
 from aquasec.statics import BENCH_REPORTS
-from aquasec.exceptions import AquaSecWrongParam, AquaSecError
+from aquasec.exceptions import AquaSecAPIError, AquaSecWrongParam, AquaSecError
 from aquasec.utilities import reformat_exception
 
 logger.addLogger(__name__)
-aquasec_logger = logger.getLogger(__name__)
+aquasec_logger: Logger = logger.getLogger(__name__)
 if not config.SET_LOG:
     aquasec_logger.disabled = True
 
 
 class Hosts:
-    host_ids: list
-    cluster_name: str
+    """Gets list of host ID's from AquaSec
+    """
+    host_ids: list = []
+    __cluster_name: str = ""
 
-    def __init__(self, api: API, **kwargs):
-        self.api = api
-        self.cluster_name: str = kwargs.pop('cluster_name', 'all')
+    def __init__(self, api: API, **kwargs) -> None:
+        """Get listed Hosts through Query
 
-    def delete(self):
+        Args:
+            api (API): AquaSec API Auth
+            cluster_name (str|optional): Retrieve only specific Cluster Name. DEFAULT: All
+        """
+        self.api: API = api
+        self.__cluster_name: str = kwargs.pop('cluster_name', '')
+
+    @property
+    def cluster_name(self) -> str:
+        """Cluster Name Attribute
+
+        Returns:
+            str: Cluster Name
+        """
+        self.__cluster_name: str = ""
+        return self.__cluster_name
+
+    @cluster_name.setter
+    def cluster_name(self, value: str) -> None:
+        self.__cluster_name: str = value
+
+    @cluster_name.deleter
+    def cluster_name(self) -> None:
+        del self.__cluster_name
+
+    def delete(self) -> None:
         """deletes current host ids
         """
         self.host_ids = []
-        self.cluster_name = ''
 
-    def run(self):
+    def run(self, **kwargs) -> None:
         """Runs a collection of hosts
         """
         self.delete()
+        self.__cluster_name: str = kwargs.pop('cluster_name') if kwargs.get(
+            'cluster_name', '') else self.__cluster_name
         aquasec_logger.info("Gathering list of hosts IDs")
-        self.host_ids = self._get_hosts()
+        self.host_ids = get_listed_hosts(
+            api=self.api, cluster_name=self.cluster_name)
         aquasec_logger.info("Got list of %s hosts", str(len(self.host_ids)))
 
-    def _get_hosts(self) -> list:
-        """Gets all hosts by ID
+# Command used to directly collect Hosts List or called from Query Class Hosts
+def get_listed_hosts(api: API, cluster_name: str = "") -> list:
+    """Gets all hosts by ID
 
-        Args:
-            cluster_name (str, optional): _description_. Defaults to "".
+    Args:
+        api (API): API
+        cluster_name (str, optional): _description_. Defaults to "".
 
-        Returns:
-            list: _description_
-        """
-        host_id_list: list = []
-        response = self.api.get.workload_protection(
-            url_path=config.WORKLOAD_URL_PATHS['hosts']['path'],
-            api_version=config.WORKLOAD_URL_PATHS['hosts']['version'],
-            get_all=True)
-        try:
-            all_hosts: list = response['result']
-        except KeyError as err:
-            error = reformat_exception(err)
-            aquasec_logger.error("AquaSecAPIError: %s", error)
-        if self.cluster_name:
-            aquasec_logger.info(
-                "Searching for hosts that belong to self.cluster_name=%s", self.cluster_name)
-        for _ in all_hosts:
-            if self.cluster_name and _['cluster_name'] == self.cluster_name:
-                host_id_list.append(_['id'])
-            else:
-                host_id_list.append(_['id'])
-        return host_id_list
+    Returns:
+        list: _description_
+    """
+    host_id_list: list = []
+    response: Dict[str, Any] = api.get.workload_protection(
+        url_path=config.WORKLOAD_URL_PATHS['hosts']['path'],
+        api_version=config.WORKLOAD_URL_PATHS['hosts']['version'],
+        get_all=True)
+    try:
+        all_hosts: list = response['result']
+    except KeyError as err:
+        error: str = reformat_exception(err)
+        aquasec_logger.error("AquaSecAPIError: %s", error)
+        raise AquaSecAPIError(error)  # pylint: disable=raise-missing-from
+    if cluster_name:
+        aquasec_logger.info(
+            "Searching for hosts that belong to cluster_name=%s", cluster_name)
+    for _ in all_hosts:
+        if cluster_name and _['cluster_name'] == cluster_name:
+            host_id_list.append(_['id'])
+        if not cluster_name:
+            host_id_list.append(_['id'])
+    return host_id_list
 
 
 class ClusterHosts:
@@ -132,7 +164,7 @@ class BenchReport:
         self.bench_report = None
         self.host_ids = []
 
-    def run(self, **kwargs):
+    def run(self, **kwargs) -> None:
         """_summary_
         """
         self.delete()
@@ -153,7 +185,7 @@ class BenchReport:
         self._get_bench_report()
         aquasec_logger.info("Generated report")
 
-    def _get_bench_report(self):
+    def _get_bench_report(self) -> None:
         """Get Bench Report
 
         Args:
