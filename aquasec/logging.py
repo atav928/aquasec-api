@@ -114,3 +114,13 @@ class RotatingLog:
         """
         if not Path.exists(logDir):
             Path(logDir).mkdir(parents=True, exist_ok=True)
+
+if __name__ == "__main__":
+    sample_logger = RotatingLog(name=__name__, logName="sample_test.log", level="DEBUG")
+    log = sample_logger.getLogger(name=__name__)
+    log.info("msg=\"This is an information log\"")
+    log.debug("msg=\"This is a debug log\"")
+    log.warning("msg=\"This is a warn log\"")
+    log.critical("msg=\"This is a critical log\"")
+    log.debug("msg=\"logger was creted\"|dir=%s|file_name=%s",
+              sample_logger.settings.logDir, sample_logger.settings.logName)

@@ -179,9 +179,11 @@ class BenchReport:
                             self.report_type, self.report_format)
         aquasec_logger.info("Getting list of hosts %s",
                             f" for clusters{f' {self.cluster_name}' if self.cluster_name else ''}")
-        hosts = Hosts(self.api, cluster_name=self.cluster_name)
-        hosts.run()
-        self.host_ids = hosts.host_ids
+        # hosts = Hosts(self.api, cluster_name=self.cluster_name)
+        # hosts.run()
+        self.cluster_name: str = kwargs.pop('cluster_name') if kwargs.get(
+            'cluster_name', '') else self.cluster_name
+        self.host_ids = get_listed_hosts(api=self.api, cluster_name=self.cluster_name)
         self._get_bench_report()
         aquasec_logger.info("Generated report")
 
@@ -340,3 +342,56 @@ class BenchReport:
         """
         return self.reports if self.report_type.lower() == 'all' else [
             self.report_type]
+
+# Commands
+def get_bench_report(api: API, raw_report: Dict[str, Any], host_ids: list) -> None:
+    """Get Bench Report
+
+    Args:
+        host_id_list (list): _description_
+        report_type (str): _description_
+
+    Returns:
+        dict: _description_
+    """
+    for _ in host_ids:
+        raw_report[_] = api.get.workload_protection(
+            url_path=config.WORKLOAD_URL_PATHS['host_bench_report']['path'].format(_),
+            api_version=config.WORKLOAD_URL_PATHS['host_bench_report']['version'])
+    self.__REPORT_FORMAT_FUNC[self.report_format]()
+
+def build_report(self, raw_report: Dict[str,Any], bench_list: list, host_id: str, report_format: str = "list"):
+    data: dict = {}
+    try:
+        data["id"] = host_id
+        data["date"] = raw_report[host_id]["date"]
+        for bench in bench_list:
+            data[f"{bench}_report"] = {}
+            data[f"{bench}_report"][f"{bench}_file"] = raw_report[host_id][bench]['host']['file']
+            data[f"{bench}_report"][f"{bench}_logical_name"] = raw_report[host_id][bench]['host']['logical_name']
+            data[f"{bench}_report"][f"{bench}_name"] = raw_report[host_id][bench]['host']['name']
+            data[f"{bench}_report"][f"{bench}_total_info"] = raw_report[host_id][bench]["result"]["total_info"]
+            data[f"{bench}_report"][f"{bench}_total_pass"] = raw_report[host_id][bench]["result"]["total_pass"]
+            data[f"{bench}_report"][f"{bench}_total_warn"] = raw_report[host_id][bench]["result"]["total_warn"]
+            data[f"{bench}_report"][f"{bench}_total_fail"] = raw_report[host_id][bench]["result"]["total_fail"]
+            data[f"{bench}_report"][f"{bench}_disabled"] = raw_report[host_id][bench]["result"]["disabled"]
+            data[f"{bench}_report"][f"{bench}_version"] = raw_report[host_id][bench]["result"]["version"]
+            data[f"{bench}_report"][f"{bench}_scan_status"] = raw_report[host_id][bench]["scan_status"]["status"]
+            data[f"{bench}_report"][f"{bench}_scan_message"] = raw_report[host_id][bench]["scan_status"]["message"]
+            if report_format == "list":
+                data[f"{bench}_report"][f"{bench}_tests"] = raw_report[host_id][bench]["result"]["tests"]
+            if report_format == "flat_list":
+                __reformat_flat_list(
+                    bench=bench, value=raw_report[host_id], host_id=host_id)
+        data["enforcer_status"] = raw_report[host_id].get(
+            "enforcer_status", "")
+        return data
+    except Exception as err:
+        error = reformat_exception(err)
+        aquasec_logger.error("AquaSecError: %s", error)
+        aquasec_logger.debug(
+            "bench_list=%s|host_id=%s|bench=%s", bench_list, host_id, bench)
+        raise AquaSecError(error)
+
+def __reformat_flat_list():
+    """Reformat into Flat List"""
